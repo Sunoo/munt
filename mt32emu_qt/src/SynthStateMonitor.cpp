@@ -201,6 +201,11 @@ const QColor *LEDWidget::color() const {
 void LEDWidget::setColor(const QColor *newColor) {
 	if (colorProperty != newColor) {
 		colorProperty = newColor;
+		if (newColor != &COLOR_GRAY) {
+			qDebug("Message LED: ON");
+		} else {
+			qDebug("Message LED: OFF");
+		}
 		update();
 	}
 }
@@ -258,6 +263,8 @@ void LCDWidget::paintEvent(QPaintEvent *) {
 	xstart = 0;
 	yat = 0;
 
+	QString lcdMsg = "                    ";
+
 	for (int i = 0; i < 20; i++) {
 		unsigned char c;
 		c = 0x20;
@@ -268,6 +275,12 @@ void LCDWidget::paintEvent(QPaintEvent *) {
 		// Don't render characters we don't have mapped
 		if (c < 0x20) c = 0x20;
 		if (c > 0x7f) c = 0x20;
+
+		if (maskedChar[i] && (lcdState == DISPLAYING_PART_STATE)) {
+			lcdMsg[i] = '#';
+		} else {
+			lcdMsg[i] = c;
+		}
 
 		c -= 0x20;
 
@@ -293,6 +306,7 @@ void LCDWidget::paintEvent(QPaintEvent *) {
 		}
 		xstart += 12;
 	}
+	qDebug("LCD Display: " + lcdMsg.toLocal8Bit());
 }
 
 void LCDWidget::handleLCDMessageDisplayed(const QString useText) {
