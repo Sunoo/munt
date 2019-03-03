@@ -20,6 +20,11 @@
 #include "ui_SynthWidget.h"
 #include "font_6x8.h"
 
+#ifdef WITH_CHARACTER_LCD
+#include <wiringPi.h>
+#include "CharacterLCD.h"
+#endif
+
 static const MasterClockNanos LCD_MESSAGE_DISPLAYING_NANOS = 200 * MasterClock::NANOS_PER_MILLISECOND;
 static const MasterClockNanos LCD_TIMBRE_NAME_DISPLAYING_NANOS = 1200 * MasterClock::NANOS_PER_MILLISECOND;
 static const MasterClockNanos MIDI_MESSAGE_LED_MINIMUM_NANOS = 60 * MasterClock::NANOS_PER_MILLISECOND;
@@ -203,9 +208,11 @@ void LEDWidget::setColor(const QColor *newColor) {
 		colorProperty = newColor;
 #ifdef WITH_CHARACTER_LCD
 		if (newColor != &COLOR_GRAY) {
-			qDebug("Message LED: ON");
+			//qDebug("Message LED: ON");
+			digitalWrite(0, HIGH);
 		} else {
-			qDebug("Message LED: OFF");
+			//qDebug("Message LED: OFF");
+			digitalWrite(0, LOW);
 		}
 #endif
 		update();
@@ -265,7 +272,7 @@ void LCDWidget::paintEvent(QPaintEvent *) {
 	xstart = 0;
 	yat = 0;
 
-	QString lcdMsg = "                    ";
+	//QString lcdMsg = "                    ";
 
 	for (int i = 0; i < 20; i++) {
 		unsigned char c;
@@ -280,9 +287,11 @@ void LCDWidget::paintEvent(QPaintEvent *) {
 
 #ifdef WITH_CHARACTER_LCD
 		if (maskedChar[i] && (lcdState == DISPLAYING_PART_STATE)) {
-			lcdMsg[i] = '#';
+			//lcdMsg[i] = '#';
+			SerialWrite(0xBE);
 		} else {
-			lcdMsg[i] = c;
+			//lcdMsg[i] = c;
+			SerialWrite(c);
 		}
 #endif
 
@@ -310,7 +319,7 @@ void LCDWidget::paintEvent(QPaintEvent *) {
 		}
 		xstart += 12;
 	}
-	qDebug("LCD Display: " + lcdMsg.toLocal8Bit());
+	//qDebug("LCD Display: " + lcdMsg.toLocal8Bit());
 }
 
 void LCDWidget::handleLCDMessageDisplayed(const QString useText) {

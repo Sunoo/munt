@@ -64,6 +64,8 @@ set(mt32emu_qt_SOURCES
   src/mididrv/MidiDriver.cpp
   src/mididrv/TestDriver.cpp
   src/mididrv/SMFDriver.cpp
+
+  src/CharacterLCD.cpp
 )
 
 set(mt32emu_qt_FORMS

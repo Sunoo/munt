@@ -56,6 +56,11 @@
 #include "mididrv/OSSMidiPortDriver.h"
 #endif
 
+#ifdef WITH_CHARACTER_LCD
+#include <wiringPi.h>
+#include "CharacterLCD.h"
+#endif
+
 static const int ACTUAL_SETTINGS_VERSION = 2;
 
 static Master *instance = NULL;
@@ -112,6 +117,16 @@ Master::Master() {
 	qRegisterMetaType<MidiSession *>("MidiSession*");
 	qRegisterMetaType<MidiSession **>("MidiSession**");
 	qRegisterMetaType<SynthState>("SynthState");
+
+#ifdef WITH_CHARACTER_LCD
+	qDebug("START UP");
+	wiringPiSetup();
+	pinMode(0, OUTPUT);
+	digitalWrite(0, LOW);
+	OpenSerial();
+	SerialWrite(0x16);
+	SerialWrite(" ** Roland MT-32 ** ");
+#endif
 }
 
 Master::~Master() {
@@ -144,6 +159,12 @@ Master::~Master() {
 	}
 
 	MasterClock::cleanup();
+
+#ifdef WITH_CHARACTER_LCD
+	qDebug("SHUTDOWN");
+	digitalWrite(0, LOW);
+	CloseSerial();
+#endif
 }
 
 void Master::initAudioDrivers() {
