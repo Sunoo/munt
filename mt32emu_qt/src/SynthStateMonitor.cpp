@@ -201,11 +201,13 @@ const QColor *LEDWidget::color() const {
 void LEDWidget::setColor(const QColor *newColor) {
 	if (colorProperty != newColor) {
 		colorProperty = newColor;
+#ifdef WITH_CHARACTER_LCD
 		if (newColor != &COLOR_GRAY) {
 			qDebug("Message LED: ON");
 		} else {
 			qDebug("Message LED: OFF");
 		}
+#endif
 		update();
 	}
 }
@@ -276,11 +278,13 @@ void LCDWidget::paintEvent(QPaintEvent *) {
 		if (c < 0x20) c = 0x20;
 		if (c > 0x7f) c = 0x20;
 
+#ifdef WITH_CHARACTER_LCD
 		if (maskedChar[i] && (lcdState == DISPLAYING_PART_STATE)) {
 			lcdMsg[i] = '#';
 		} else {
 			lcdMsg[i] = c;
 		}
+#endif
 
 		c -= 0x20;
 
