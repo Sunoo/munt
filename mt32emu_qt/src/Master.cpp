@@ -119,12 +119,10 @@ Master::Master() {
 	qRegisterMetaType<SynthState>("SynthState");
 
 #ifdef WITH_CHARACTER_LCD
-	qDebug("START UP");
 	wiringPiSetup();
 	pinMode(0, OUTPUT);
 	digitalWrite(0, LOW);
 	OpenSerial();
-	SerialWrite(0x16);
 	SerialWrite(" ** Roland MT-32 ** ");
 #endif
 }
@@ -161,7 +159,6 @@ Master::~Master() {
 	MasterClock::cleanup();
 
 #ifdef WITH_CHARACTER_LCD
-	qDebug("SHUTDOWN");
 	digitalWrite(0, LOW);
 	CloseSerial();
 #endif

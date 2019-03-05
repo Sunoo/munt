@@ -78,6 +78,7 @@ SynthStateMonitor::~SynthStateMonitor() {
 		delete patchNameLabel[i];
 	}
 	freePartialsData();
+	SerialWrite(" ** Roland MT-32 ** ");
 }
 
 void SynthStateMonitor::enableMonitor(bool enable) {
@@ -272,8 +273,6 @@ void LCDWidget::paintEvent(QPaintEvent *) {
 	xstart = 0;
 	yat = 0;
 
-	//QString lcdMsg = "                    ";
-
 	for (int i = 0; i < 20; i++) {
 		unsigned char c;
 		c = 0x20;
@@ -287,10 +286,8 @@ void LCDWidget::paintEvent(QPaintEvent *) {
 
 #ifdef WITH_CHARACTER_LCD
 		if (maskedChar[i] && (lcdState == DISPLAYING_PART_STATE)) {
-			//lcdMsg[i] = '#';
 			SerialWrite(0xBE);
 		} else {
-			//lcdMsg[i] = c;
 			SerialWrite(c);
 		}
 #endif
@@ -319,7 +316,6 @@ void LCDWidget::paintEvent(QPaintEvent *) {
 		}
 		xstart += 12;
 	}
-	//qDebug("LCD Display: " + lcdMsg.toLocal8Bit());
 }
 
 void LCDWidget::handleLCDMessageDisplayed(const QString useText) {

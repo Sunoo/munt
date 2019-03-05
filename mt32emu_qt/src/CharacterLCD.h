@@ -10,3 +10,4 @@ void OpenSerial();
 void CloseSerial();
 void SerialWrite(const unsigned char c);
 void SerialWrite(const char *s);
+void ClearScreen();
