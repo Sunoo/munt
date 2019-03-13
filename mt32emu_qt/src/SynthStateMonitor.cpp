@@ -78,7 +78,10 @@ SynthStateMonitor::~SynthStateMonitor() {
 		delete patchNameLabel[i];
 	}
 	freePartialsData();
+#ifdef WITH_CHARACTER_LCD
 	SerialWrite(" ** Roland MT-32 ** ");
+	digitalWrite(0, LOW);
+#endif
 }
 
 void SynthStateMonitor::enableMonitor(bool enable) {
@@ -94,6 +97,9 @@ void SynthStateMonitor::handleSynthStateChange(SynthState state) {
 	enableMonitor(state == SynthState_OPEN);
 	lcdWidget.reset();
 	midiMessageLED.setColor(&COLOR_GRAY);
+#ifdef WITH_CHARACTER_LCD
+	digitalWrite(0, LOW);
+#endif
 
 	uint newPartialCount = synthRoute->getPartialCount();
 	if (partialCount == newPartialCount || state != SynthState_OPEN) {
@@ -115,6 +121,9 @@ void SynthStateMonitor::handleSynthStateChange(SynthState state) {
 void SynthStateMonitor::handleMIDIMessagePlayed() {
 	if (ui->synthFrame->isVisible() && synthRoute->getState() == SynthRouteState_OPEN) {
 		midiMessageLED.setColor(&COLOR_GREEN);
+#ifdef WITH_CHARACTER_LCD
+		digitalWrite(0, HIGH);
+#endif
 		midiMessageLEDStartNanos = MasterClock::getClockNanos();
 	}
 }
@@ -156,9 +165,15 @@ void SynthStateMonitor::handleUpdate() {
 
 	if (midiMessageOn) {
 		midiMessageLED.setColor(&COLOR_GREEN);
+#ifdef WITH_CHARACTER_LCD
+		digitalWrite(0, HIGH);
+#endif
 		midiMessageLEDStartNanos = nanosNow;
 	} else if ((nanosNow - midiMessageLEDStartNanos) > MIDI_MESSAGE_LED_MINIMUM_NANOS) {
 		midiMessageLED.setColor(&COLOR_GRAY);
+#ifdef WITH_CHARACTER_LCD
+		digitalWrite(0, LOW);
+#endif
 	}
 }
 
@@ -207,15 +222,6 @@ const QColor *LEDWidget::color() const {
 void LEDWidget::setColor(const QColor *newColor) {
 	if (colorProperty != newColor) {
 		colorProperty = newColor;
-#ifdef WITH_CHARACTER_LCD
-		if (newColor != &COLOR_GRAY) {
-			//qDebug("Message LED: ON");
-			digitalWrite(0, HIGH);
-		} else {
-			//qDebug("Message LED: OFF");
-			digitalWrite(0, LOW);
-		}
-#endif
 		update();
 	}
 }
